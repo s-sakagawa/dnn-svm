@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "dnn-svm"
+version = "0.0.1"
+description = ""
+authors = ["S.Sakagawa <s.shusky97@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+flake8 = "^3.7"
+flake8-import-order = "^0.18.1"
+pep8-naming = "^0.8.2"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
