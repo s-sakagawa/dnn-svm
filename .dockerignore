@@ -4,6 +4,7 @@ docker
 .gitattributes
 .gitignore
 README.md
-CHANGELOG.md
-LICENSE
+notebooks/*
+!notebooks/configs
+out
 .idea

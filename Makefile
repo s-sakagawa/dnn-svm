@@ -1,6 +1,7 @@
 NVIDIA_SMI_PATH := $(shell which nvidia-smi)
 IMAGE_NAME := dlsvm
 CONTAINER_NAME := dlsvm
+USER := dlsvm
 WORKINGDIR := /var/www
 PWD := $(shell pwd)
 
@@ -31,6 +32,8 @@ run:
 		$(DOCKER_GPU_PARAMS) \
 		--name $(CONTAINER_NAME) \
 		--volume $(PWD):$(WORKINGDIR) \
+		--publish 8888:8888 \
+		--user $(USER) \
 		$(IMAGE_NAME) \
 		$(ARGS)
 
@@ -38,6 +41,12 @@ run:
 bash: ARGS=bash
 export ARGS
 bash:
+	@$(MAKE) run
+
+.PHONY: lab
+lab: ARGS=jupyter lab --ip=0.0.0.0
+export ARGS
+lab:
 	@$(MAKE) run
 
 .PHONY: test

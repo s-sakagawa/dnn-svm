@@ -1,33 +1,50 @@
-FROM tensorflow/tensorflow:latest-py3
+FROM node:12.14.0-stretch as node
+
+FROM tensorflow/tensorflow:2.0.0-py3
 LABEL maintainer="S.Sakagawa <s.shusky97@gmail.com>"
 
 SHELL ["/bin/bash", "-c"]
 
 ENV ROOTHOME /root
 ENV WORKSPACE /var/www
-ENV POETRY_VERSION 1.0.2
+ENV POETRY_VERSION 1.0.5
 
 RUN mkdir -p $WORKSPACE
 WORKDIR $WORKSPACE
 
-RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/$POETRY_VERSION/get-poetry.py > get-poetry.py && \
-    python get-poetry.py -y --version $POETRY_VERSION
+# install poetry
+RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py > get-poetry.py && \
+    python get-poetry.py -y --version $POETRY_VERSION && \
+    rm get-poetry.py
+
+# install node
+COPY --from=node /usr/local/bin/node /usr/local/bin/
+COPY --from=node /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
+RUN ln -s /usr/local/bin/node /usr/local/bin/nodejs && \
+    ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
+    ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npx
 
 # set poetry's path
 ENV PATH $ROOTHOME/.poetry/bin:$PATH
 
 COPY pyproject.toml $WORKSPACE
 COPY poetry.lock $WORKSPACE
+COPY dlsvm $WORKSPACE/dlsvm/
 
-RUN poetry config virtualenvs.create false && \
-    pip install --upgrade pip && \
-    pip install -U setuptools && \
-    poetry install -n
+RUN pip install --upgrade pip && \
+    pip install --upgrade keyrings.alt && \
+    poetry config virtualenvs.create false && \
+    poetry install -n && \
+    jupyter lab build
 
-ENV USERNAME python
+ENV USERNAME dlsvm
+ENV USERHOME /home/$USERNAME
+
 RUN groupadd -r $USERNAME && \
- useradd -r -g $USERNAME $USERNAME && \
- chown $USERNAME:$USERNAME -R $ROOTHOME
+    useradd -r -m -g $USERNAME $USERNAME
+
+COPY notebooks/configs $USERHOME/.jupyter/
+RUN chown $USERNAME:$USERNAME -R $ROOTHOME $WORKSPACE $USERHOME
 
 USER $USERNAME
 ENV PATH $ROOTHOME/.poetry/bin:$PATH
