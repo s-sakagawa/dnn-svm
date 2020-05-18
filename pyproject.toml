@@ -3,6 +3,9 @@ name = "dnn-svm"
 version = "0.0.1"
 description = ""
 authors = ["S.Sakagawa <s.shusky97@gmail.com>"]
+packages = [
+    { include = "dlsvm" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.6"
