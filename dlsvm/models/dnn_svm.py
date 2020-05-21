@@ -21,7 +21,7 @@ class DnnSvm(tfk.Model):
 
     def loss_l2_svm(self, y_true, y_pred):
         matrix_shape = [tf.shape(y_true)[0], self.n_class]
-        weight = self.model.weights[2]
+        weight = self.model.layers[-1].weights[0]
 
         regularization_loss = 0.5 * tf.reduce_mean(tf.square(weight))
         hinge_loss = tf.reduce_mean(
