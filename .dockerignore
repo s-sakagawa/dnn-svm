@@ -1,0 +1,10 @@
+docker
+.circleci
+.git
+.gitattributes
+.gitignore
+README.md
+notebooks/*
+!notebooks/configs
+out
+.idea
